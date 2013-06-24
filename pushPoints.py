@@ -87,7 +87,7 @@ def writeGPStoFile(inputPayload):
 		    w.writeheader()
 		    w.writerow(att_dict)
 
-	with open("mycsvfile", "a") as f:
+	with open("mycsvfile.csv", "a") as f:
 		w = csv.DictWriter(f, att_dict.keys())
 		w.writerow(att_dict)
 
