@@ -9,7 +9,7 @@ import ConfigParser
 # Custom modules for project
 from getIP import IP2 as _IP
 from weather import getWeather as _WEATHER
-from pushPoints2 import push
+from pushPoints import push
 
 
 # initalize the GPS...
@@ -64,43 +64,46 @@ def go():
 
 	#prev = -1
 	sleep(1)
-
+	i=0
 	lcd.ON
 	while True:
 		if (lcd.buttonPressed(lcd.SELECT)):
- 			lcd.clear()
- 			lcd.message('select...exit')
- 			sleep(2)
+			lcd.clear()
+			lcd.message('select...exit')
+			sleep(2)
 			lcd.backlight(lcd.OFF)
 			sleep(2)
 			break
 
-    	if (lcd.buttonPressed(lcd.RIGHT)):
-    	    lcd.clear()
-    	    lcd.ON
-    	    lcd.message('Your IP address:\n %s' % _IP())
+		if (lcd.buttonPressed(lcd.RIGHT)):
+		    lcd.clear()
+		    lcd.ON
+		    lcd.message('Your IP address:\n %s' % _IP())
 
-    	if (lcd.buttonPressed(lcd.LEFT)):
-    	    lcd.clear()
-    	    lcd.ON
-    	    lcd.message('The time:\n%s' % strftime('%y/%m/%d %I:%M %p', gmtime()))
-    	    # Once collecting GPS coords correctly, get the time from GPS dict, not the Pi.
+		if (lcd.buttonPressed(lcd.LEFT)):
+		    lcd.clear()
+		    lcd.ON
+		    lcd.message('The time:\n%s' % strftime('%y/%m/%d %I:%M %p', gmtime()))
+		    # Once collecting GPS coords correctly, get the time from GPS dict, not the Pi.
 
-    	if (lcd.buttonPressed(lcd.UP)):
-			lcd.clear()
-			lcd.ON
-			try:
-				msg = push (gpsd, fsURL, userName, passWord, pushOnConnect)
-				content = str("{0:.3f},{1:.3f}\n{2}").format(msg[0], msg[1], msg[2])
-				print content
-				#content = "{},{}\n{}".format(msg[0], msg[1], msg[2])
-			except Exception, e:
-				print str(e)
-				content = "cant get lat/lon"
-			lcd.message(content)
+		if (lcd.buttonPressed(lcd.UP)):
+			while not lcd.buttonPressed(lcd.SELECT):
+				lcd.clear()
+				lcd.ON
+				try:
+					msg = push (gpsd, fsURL, userName, passWord, pushOnConnect)
+					content = str("{0:.3f},{1:.3f}\n{2}").format(msg[0], msg[1], msg[2])
+					print content
+					#content = "{},{}\n{}".format(msg[0], msg[1], msg[2])
+				except Exception, e:
+					print str(e)
+					content = "cant get lat/lon"
+				lcd.message(content +str(i))
+				i+=1
+				sleep(10)
 
 
-    	if (lcd.buttonPressed(lcd.DOWN)):
+		if (lcd.buttonPressed(lcd.DOWN)):
 			lcd.clear()
 			content = _WEATHER(gpsd.fix.latitude, gpsd.fix.longitude)
 			lcd.message(content)

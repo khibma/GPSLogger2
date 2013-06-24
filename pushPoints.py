@@ -77,11 +77,19 @@ def writeGPStoFile(inputPayload):
 	#  then save the point in a csv file so we can push it up later
 
 	import csv
+	att_dict = inputPayload['attributes']
 
-	with open('mycsvfile.csv', 'wb') as f:
-	    w = csv.DictWriter(f, inputPayload.keys())
-	    w.writeheader()
-	    w.writerow(inputPayload)
+	try:
+	   with open('mycsvfile.csv'): pass
+	except IOError:
+		with open('mycsvfile.csv', 'w+') as f:
+		    w = csv.DictWriter(f, att_dict.keys())
+		    w.writeheader()
+		    w.writerow(att_dict)
+
+	with open("mycsvfile", "a") as f:
+		w = csv.DictWriter(f, att_dict.keys())
+		w.writerow(att_dict)
 
 	return
 
@@ -112,9 +120,11 @@ def push(gpsdIn, fsURL, username, password, token=None):
         if len(jAdd['addResults']) > 0:
             for addItem in jAdd['addResults']:
                 if addItem['success'] == True:
-                    print "Inserted a new objectID {}".format(addItem['objectId'])
+					print "Inserted a new objectID {}".format(addItem['objectId'])
+					#TEST
+					writeGPStoFile(push)
 
-                    return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "uploaded"]
+					return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "uploaded"]
 
                 if addItem['success'] == False:
                     print "Failed to insert:"
