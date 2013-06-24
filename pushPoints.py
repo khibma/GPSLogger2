@@ -61,7 +61,9 @@ def makePayload(gpsdIn):
         "Speed" : gpsdIn.fix.speed,
         "Elevation" : gpsdIn.fix.altitude,
         "Heading" : gpsdIn.fix.track,
-        "NumSatFix" : gSatCount
+        "SatFix" : gSatCount,
+        "TotSats" : totSats,
+        "errAvg" : errAvg
       },
       "geometry" : {
         "x" : gpsdIn.fix.longitude,
