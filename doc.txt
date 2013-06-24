@@ -1,0 +1,90 @@
+To start up and run the LCD:
+
+http://learn.adafruit.com/adafruit-16x2-character-lcd-plus-keypad-for-raspberry-pi/usage
+sudo nano /etc/modules
+add the following lines to the end of file and reboots. enabled i2c hardware driver
+i2c-bcm2708 
+i2c-dev
+
+tools for python to connect/use
+sudo apt-get install python-smbus
+sudo apt-get install i2c-tools
+sudo apt-get install python-dev
+sudo apt-get install python-rpi.gpio
+
+enable the LCD
+
+sudo modprobe i2c-dev
+sudo i2cdetect -y 1    #this just checks to see if its running. Should see 20:20 in the grid.
+sudo python script.py
+
+
+To start up and run GPS
+
+http://learn.adafruit.com/adafruit-ultimate-gps-on-the-raspberry-pi/setting-everything-up
+get the Python GPS Client:
+sudo apt-get install gpsd gpsd-clients python-gps
+#sudo gpsd /dev/ttyUSB0 -F /var/run/gpsd.sock   #this starts up the USB
+
+http://learn.adafruit.com/adafruit-ultimate-gps-on-the-raspberry-pi/using-uart-instead-of-usb
+sudo nano /boot/cmdline.txt
+And change:
+dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait
+to:
+dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait
+
+sudo nano /etc/inittab
+And change:  (comment out the line)
+#Spawn a getty on Raspberry Pi serial line
+T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+to:
+#Spawn a getty on Raspberry Pi serial line
+#T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+reboot the pi
+sudo reboot now
+
+sudo gpsd /dev/ttyAMA0 -F /var/run/gpsd.sock
+cgps -s
+
+OUTPUT PYTHON DICTIONARY OF GPS
+
+<dictwrapper: {u'epx': 44.818, u'epy': 59.668, u'epv': 22.77, u'ept': 0.005, u'lon': -117.195323333,
+u'eps': 119.34, u'lat': 34.056618333, u'tag': u'RMC', u'track': 131.43, u'mode': 3,
+u'time': u'2013-06-20T18:17:50.000Z', u'device': u'/dev/ttyAMA0', u'climb': 0.9, u'alt': 278.4,
+u'speed': 1.343, u'class': u'TPV'}>
+
+sats         [PRN:  17  E:  61  Az:  29  Ss:  16  Used: y, PRN:   4  E:  43  Az: 162  Ss:   0  Used: n, PRN:   9  E:  37  Az: 156  Ss:   0  Used: n, PRN:  28  E:  36  Az:  79  Ss:   0  Used: n, PRN:  24  E:  34  Az: 314  Ss:  26  Used: y, PRN:   2  E:  21  Az: 187  Ss:  19  Used: y, PRN:  15  E:  20  Az: 259  Ss:  23  Used: y, PRN:  26  E:  18  Az: 213  Ss:  16  Used: y, PRN:   8  E:  14  Az: 146  Ss:   0  Used: n, PRN:  12  E:  10  Az: 294  Ss:  20  Used: y, PRN:   1  E:   5  Az:  36  Ss:   0  Used: n, PRN:  20  E:   1  Az:  73  Ss:   0  Used: n, PRN:  34  E:   0  Az:   0  Ss:   0  Used: n]
+
+
+good explanation ...
+http://search.cpan.org/dist/Net-GPSD3/lib/Net/GPSD3/Return/TPV.pm
+
+
+CODE TO LOG OUTPUT
+
+
+CODE TO PUSH OUTPUT TO AGOL
+
+
+
+
+======
+script on startup:
+
+make script at
+/etc/init.d/loadonboot
+
+Make script executable
+sudo chmod 755 /etc/init.d/loadonboot
+
+Test starting the program
+sudo /etc/init.d/loadonboot start
+
+Test stopping the program
+sudo /etc/init.d/loadonboot stop
+
+
+Register script to be run at start-up
+To register your script to be run at start-up and shutdown, run the following command:
+sudo update-rc.d loadonboot defaults
