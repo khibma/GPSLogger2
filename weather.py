@@ -13,7 +13,7 @@ import ConfigParser
 config = ConfigParser.ConfigParser()
 config.read("settings.ini")
 forecastKey = config.get("WEATHER", "forecastIOapiKey")
-wunderlandKey = config.get("WEATHER", "wundergroundapiKey")
+wundergroundKey = config.get("WEATHER", "wundergroundapiKey")
 
 def getYahooWeather():
 	# Hard coded to get weather in Redlands, CA
@@ -44,16 +44,18 @@ def getForecastIOWeather(lat=34.0555693, lon=-117.1825381, apiKey=forecastKey):
 	except:
 		return 0
 
-def getWunderlandWeather(lat=34.0555693, lon=-117.1825381, apiKey=wunderlandKey):
+def getWundergroundWeather(lat=34.0555693, lon=-117.1825381, apiKey=wundergroundKey):
 	# Use Redlands CA if nothing passed in
+	# Note, this will only work in US. Review city lookup outside the US
 
 	URL = "http://api.wunderground.com/api/{}/geolookup/q/{},{}.json".format(apiKey, lat, lon)
 	try:
 		response = urllib.urlopen(URL)
 		jResponse = json.loads(response.read())
+		state = jResponse["location"]["state"]
 	 	city = jResponse["location"]["city"]
 
- 		cityURL = "http://api.wunderground.com/api/{}/conditions/q/CA/{}.json".format(apiKey, city)
+ 		cityURL = "http://api.wunderground.com/api/{}/conditions/q/{}/{}.json".format(apiKey, state, city)
 		cityResponse = urllib.urlopen(cityURL)
 		jCityResponse = json.loads(cityResponse.read())
 		currentTemp = jCityResponse['current_observation']['temperature_string']
@@ -85,7 +87,7 @@ if __name__ == '__main__':
 	temp2 = getForecastIOWeather(34.0555693, -117.1825381, forecastKey)
 	print temp2
 
-	temp3 = getWunderlandWeather(34.0555693, -117.1825381, wunderlandKey)
+	temp3 = getWundergroundWeather(34.0555693, -117.1825381, wundergroundKey)
 	print temp3
 
 	temp4 = getWeather(34.0555693, -117.1825381)
