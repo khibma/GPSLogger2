@@ -2,7 +2,7 @@
 # Pick your poision......
 #   getYahooWeather : Yahoo Weather requires knowledge of city code. This can be implemented via lookup
 #   getForecastIOWeather : ForecastIO limits to 1000 free requests per day
-#   getWunderlandWeather : WunderlandWeather limits to 500 free requests per day
+#   getWundergroundWeather : WundergroundWeather limits to 500 free requests per day
 #   getWeather : helper function to try both ForeCastIO and WunderLand
 
 import urllib, json
@@ -68,9 +68,9 @@ def getWundergroundWeather(lat=34.0555693, lon=-117.1825381, apiKey=wunderground
 def getWeather(lat, lon):
 	# Use this generic function to try weather from both sources
 
-	weather = getWunderlandWeather(lat, lon)
+	weather = getWunderlandWeather(lat, lon, wunderlandKey)
 	if weather == 0:
-		weather = getForecaseIOWeather(lat, lon)
+		weather = getForecastIOWeather(lat, lon, forecastKey)
 		if weather == 0:
 			weather = "No weather report\navailable "
 
