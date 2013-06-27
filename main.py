@@ -92,8 +92,7 @@ def go():
 				lcd.ON
 				try:
 					msg = push (gpsd, fsURL, userName, passWord, pushOnConnect)
-					content = str("{0:.3f},{1:.3f}\n{2}").format(msg[0], msg[1], msg[2])
-					print content
+					content = str("{0:.3f},{1:.3f}\n{2}").format(msg[0], msg[1], msg[2])					
 					#content = "{},{}\n{}".format(msg[0], msg[1], msg[2])
 				except Exception, e:
 					print str(e)
@@ -130,7 +129,8 @@ if __name__ == '__main__':
 			gpsp.running = False
 			gpsp.join() # wait for the thread to finish what it's doing
 
-		except:
+		except Exception, e:
+			print str(e)
 			print "its all over"
 			gpsp.running = False
 			gpsp.join()

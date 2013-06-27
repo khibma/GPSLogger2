@@ -40,11 +40,12 @@ def makePayload(gpsdIn):
     # total satellites in the schema yet....
 	# count how many satellites there are and  used
     sats = gpsdIn.satellites
+    
     gSatCount = 0
-    for item in sats:
+    for item in sats:        
         if item.used == True:
             gSatCount += 1
-    totSats = len(sats)
+    totSats = len(sats)    
 
     # average error not in the schema yet....
 	# get a real *rough* error apprxomation from x/y
@@ -61,7 +62,7 @@ def makePayload(gpsdIn):
         "Speed" : gpsdIn.fix.speed,
         "Elevation" : gpsdIn.fix.altitude,
         "Heading" : gpsdIn.fix.track,
-        "SatFix" : gSatCount,
+        "NumSatFix" : gSatCount,
         "TotSats" : totSats,
         "errAvg" : errAvg
       },

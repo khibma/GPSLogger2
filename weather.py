@@ -68,7 +68,7 @@ def getWundergroundWeather(lat=34.0555693, lon=-117.1825381, apiKey=wunderground
 def getWeather(lat, lon):
 	# Use this generic function to try weather from both sources
 
-	weather = getWunderlandWeather(lat, lon, wunderlandKey)
+	weather = getWundergroundWeather(lat, lon, wundergroundKey)
 	if weather == 0:
 		weather = getForecastIOWeather(lat, lon, forecastKey)
 		if weather == 0:
