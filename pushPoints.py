@@ -40,12 +40,12 @@ def makePayload(gpsdIn):
     # total satellites in the schema yet....
 	# count how many satellites there are and  used
     sats = gpsdIn.satellites
-    
+
     gSatCount = 0
-    for item in sats:        
+    for item in sats:
         if item.used == True:
             gSatCount += 1
-    totSats = len(sats)    
+    totSats = len(sats)
 
     # average error not in the schema yet....
 	# get a real *rough* error apprxomation from x/y
@@ -83,17 +83,20 @@ def writeGPStoFile(inputPayload):
 	att_dict = inputPayload['attributes']
 
 	try:
-	   with open('mycsvfile.csv'): pass
+	   with open('POINTS.csv', 'a'):
+  		w = csv.DictWriter(f, att_dict.keys())
+		w.writerow(att_dict)
+
 	except IOError:
-		with open('mycsvfile.csv', 'w+') as f:
+		with open('POINTS.csv', 'w') as f:
 		    w = csv.DictWriter(f, att_dict.keys())
 		    w.writeheader()
 		    w.writerow(att_dict)
-
+	'''
 	with open("mycsvfile.csv", "a") as f:
 		w = csv.DictWriter(f, att_dict.keys())
 		w.writerow(att_dict)
-
+	'''
 	return
 
 
