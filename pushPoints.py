@@ -83,7 +83,7 @@ def writeGPStoFile(inputPayload):
 	att_dict = inputPayload['attributes']
 
 	try:
-	   with open('POINTS.csv', 'a'):
+	   with open('POINTS.csv', 'a') as f:
   		w = csv.DictWriter(f, att_dict.keys())
 		w.writerow(att_dict)
 

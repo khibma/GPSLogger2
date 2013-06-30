@@ -78,7 +78,8 @@ def go():
 				sleep(1)
 				if (lcd.buttonPressed(lcd.DOWN)):
 					out = False
-					lcd.message("stopped collecting")
+					lcd.clear()
+					lcd.message("stopped\ncollecting")
 				###
 				i+=1
 				sleep(int(pCollectTime))
