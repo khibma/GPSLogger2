@@ -109,6 +109,7 @@ def go(filename):
 				        gSatCount += 1
 				totSats = len(sats)
 				lcd.message("%s Sats \n overhead" % totSats)
+				sleep(1)
 
 
 
@@ -207,7 +208,7 @@ if __name__ == '__main__':
  			itsOver = go(filename)
  			gpsp.running = False
 			gpsp.join() # wait for the thread to finish what it's doing
-			print itsOvercd
+			print itsOver
 
 		except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
 			print "\nKilling Thread..."
