@@ -93,10 +93,23 @@ def go(filename):
 
 		if (lcd.buttonPressed(lcd.LEFT)):
 			# reconnects the internet if disconnected
-			prev = -1
 			lcd.clear()
-			lcd.message("reconneting internet")
-			# to be tested, what happens if cell phone internet drops, will it reconnect
+
+			if prev == 'l1':
+				prev = -1
+				lcd.message("reconneting internet")
+				# to be tested, what happens if cell phone internet drops, will it reconnect
+
+			else:
+				prev = 'l1'
+				sats = gpsd.satellites
+				gSatCount = 0
+				for item in sats:
+				    if item.used == True:
+				        gSatCount += 1
+				totSats = len(sats)
+				lcd.message("%s Sats \n overhead" % totSats)
+
 
 
 		if (lcd.buttonPressed(lcd.UP)):
@@ -159,13 +172,13 @@ def go(filename):
 			else:
 				prev = 'd1'
 				try:
-					with open(fname) as f:
+					with open(filename) as f:
 						for i, l in enumerate(f):
 							pass
 					lines = i+1
 				except IOError: lines = "???"
 
-				lcd.message("file has %s\n  lines" %lines)
+				lcd.message("f: %s has\n %s lines" % (filename, lines))
 				sleep(1)
 
 

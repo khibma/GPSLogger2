@@ -129,12 +129,12 @@ def push(gpsdIn, fsURL, username, password, filename):
 	            for addItem in jAdd['addResults']:
 	                if addItem['success'] == True:
 						print "Inserted a new objectID {}".format(addItem['objectId'])
-						pushStatus = "uploaded"
+						pushStatus = "uploaded_"
 
 	                if addItem['success'] == False:
-	                    print "Failed to insert:"
-	                    print addItem['error']['description']
-                        pushStatus = "failed2up"
+						print "Failed to insert:"
+						print addItem['error']['description']
+						pushStatus = "failed2up_"
 
 
         # FOR NOW, WRITE TO CSV
