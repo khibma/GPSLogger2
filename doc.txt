@@ -61,7 +61,7 @@ good explanation ...
 http://search.cpan.org/dist/Net-GPSD3/lib/Net/GPSD3/Return/TPV.pm
 
 
-CODE TO LOG OUTPUT
+CODE TO LOG OUTP
 
 
 CODE TO PUSH OUTPUT TO AGOL
@@ -70,6 +70,7 @@ CODE TO PUSH OUTPUT TO AGOL
 
 
 ======
+http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html
 script on startup:
 
 make script at

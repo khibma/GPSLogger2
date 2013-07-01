@@ -104,51 +104,51 @@ def push(gpsdIn, fsURL, username, password, token=None):
     # Add points to the online feature service
     #
 
-    tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
+	push = makePayload(gpsdIn)
 
-    if len(username) > 0 and len(password) > 0:
-        token = gentoken(tokenUrl, username, password)
+	# This may 'except' if no WWW is available.
+	try:
+	    tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
 
-    push = makePayload(gpsdIn)
+	    if len(username) > 0 and len(password) > 0:
+	        token = gentoken(tokenUrl, username, password)
 
-    submitData = {}
-    submitData["Features"] = push
-    submitData["f"] = "json"
-    submitData["token"] = token
+	    submitData = {}
+	    submitData["Features"] = push
+	    submitData["f"] = "json"
+	    submitData["token"] = token
 
-    # submit the request
-    submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
-    jAdd = json.loads(submitResponse.read())
+	    # submit the request
+	    submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
+	    jAdd = json.loads(submitResponse.read())
 
-    # this is a little overkill right now as it will parse over multiple inputs
-    # however, right now submission is only 1 at a time
-    if "addResults" in jAdd:
-        if len(jAdd['addResults']) > 0:
-            for addItem in jAdd['addResults']:
-                if addItem['success'] == True:
-					print "Inserted a new objectID {}".format(addItem['objectId'])
-					#TEST
-					writeGPStoFile(push)
+	    # this is a little overkill right now as it will parse over multiple inputs
+	    # however, right now submission is only 1 at a time
+	    if "addResults" in jAdd:
+	        if len(jAdd['addResults']) > 0:
+	            for addItem in jAdd['addResults']:
+	                if addItem['success'] == True:
+						print "Inserted a new objectID {}".format(addItem['objectId'])
+						pushStatus = "uploaded"
 
-					return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "uploaded"]
-
-                if addItem['success'] == False:
-                    print "Failed to insert:"
-                    print addItem['error']['description']
-
-					# write the point to the csv file
-                    writeGPStoFile(push)
-
-                    return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "failed"]
-
-    else:
-        # write the point to the csv file
-        writeGPStoFile(push)
-        print "Couldnt add anything.."
-        print jAdd
+	                if addItem['success'] == False:
+	                    print "Failed to insert:"
+	                    print addItem['error']['description']
+                        pushStatus = "failed2up"
 
 
-    return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "unknown"]
+        # FOR NOW, WRITE TO CSV
+		writeGPStoFile(push)
+
+		return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, pushStatus]
+
+	except:
+		# write the point to the csv file
+		writeGPStoFile(push)
+		print "Couldnt add anything.."
+		print jAdd
+
+		return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "failed2up"]
 
 
 if __name__ == "__main__":
