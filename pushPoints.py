@@ -75,7 +75,7 @@ def makePayload(gpsdIn):
     return payload
 
 
-def writeGPStoFile(inputPayload):
+def writeGPStoFile(inputPayload, filename):
 	# If we cant push the point into AGOL for some reason (like theres no internet connection available),
 	#  then save the point in a csv file so we can push it up later
 
@@ -83,12 +83,12 @@ def writeGPStoFile(inputPayload):
 	att_dict = inputPayload['attributes']
 
 	try:
-	   with open('POINTS.csv', 'a') as f:
+	   with open(filename, 'a') as f:
   		w = csv.DictWriter(f, att_dict.keys())
 		w.writerow(att_dict)
 
 	except IOError:
-		with open('POINTS.csv', 'w') as f:
+		with open(filename, 'w') as f:
 		    w = csv.DictWriter(f, att_dict.keys())
 		    w.writeheader()
 		    w.writerow(att_dict)
@@ -100,7 +100,7 @@ def writeGPStoFile(inputPayload):
 	return
 
 
-def push(gpsdIn, fsURL, username, password, token=None):
+def push(gpsdIn, fsURL, username, password, filename):
     # Add points to the online feature service
     #
 
@@ -138,13 +138,13 @@ def push(gpsdIn, fsURL, username, password, token=None):
 
 
         # FOR NOW, WRITE TO CSV
-		writeGPStoFile(push)
+		writeGPStoFile(push, filename)
 
 		return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, pushStatus]
 
 	except:
 		# write the point to the csv file
-		writeGPStoFile(push)
+		writeGPStoFile(push, filename)
 		print "Couldnt add anything.."
 		print jAdd
 
