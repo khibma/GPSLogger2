@@ -1,7 +1,7 @@
 import urllib, urllib2, json, sys, os
 
 
-def gentoken(tokenUrl, username, password, expiration=60):
+def gentoken(tokenUrl, username, password, expiration=525600):
     # Classic token generation for consumption later.
     #
 
@@ -100,7 +100,7 @@ def writeGPStoFile(inputPayload, filename):
 	return
 
 
-def push(gpsdIn, fsURL, username, password, filename):
+def push(gpsdIn, fsURL, username, password, filename, token=None):
     # Add points to the online feature service
     #
 
@@ -108,30 +108,31 @@ def push(gpsdIn, fsURL, username, password, filename):
 
 	# This may 'except' if no WWW is available.
 	try:
-	    tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
+		tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
 
-	    if len(username) > 0 and len(password) > 0:
-	        token = gentoken(tokenUrl, username, password)
+		#if len(username) > 0 and len(password) > 0 and token is not None:
+		if token == None:
+		    token = gentoken(tokenUrl, username, password)
 
-	    submitData = {}
-	    submitData["Features"] = push
-	    submitData["f"] = "json"
-	    submitData["token"] = token
+		submitData = {}
+		submitData["Features"] = push
+		submitData["f"] = "json"
+		submitData["token"] = token
 
-	    # submit the request
-	    submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
-	    jAdd = json.loads(submitResponse.read())
+		# submit the request
+		submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
+		jAdd = json.loads(submitResponse.read())
 
-	    # this is a little overkill right now as it will parse over multiple inputs
-	    # however, right now submission is only 1 at a time
-	    if "addResults" in jAdd:
-	        if len(jAdd['addResults']) > 0:
-	            for addItem in jAdd['addResults']:
-	                if addItem['success'] == True:
+		# this is a little overkill right now as it will parse over multiple inputs
+		# however, right now submission is only 1 at a time
+		if "addResults" in jAdd:
+		    if len(jAdd['addResults']) > 0:
+		        for addItem in jAdd['addResults']:
+		            if addItem['success'] == True:
 						print "Inserted a new objectID {}".format(addItem['objectId'])
 						pushStatus = "uploaded_"
 
-	                if addItem['success'] == False:
+		            if addItem['success'] == False:
 						print "Failed to insert:"
 						print addItem['error']['description']
 						pushStatus = "failed2up_"
@@ -150,6 +151,49 @@ def push(gpsdIn, fsURL, username, password, filename):
 
 		return [gpsdIn.fix.latitude, gpsdIn.fix.longitude, "failed2up"]
 
+def pushSpecial(gpsdIn, fsURL, username, password):
+
+	try:
+		payload = {
+		  "attributes" : {
+		    "Name" : 'special',
+		    "Lat" : gpsdIn.fix.latitude,
+		    "Lon" : gpsdIn.fix.longitude,
+		    "Date" : str(gpsdIn.utc),
+		    "Speed" : 0,
+		    "Elevation" : gpsdIn.fix.altitude,
+		    "Heading" : 0,
+		    "NumSatFix" : 0,
+		    "TotSats" : 0,
+		    "errAvg" : 0
+		  },
+		  "geometry" : {
+		    "x" : gpsdIn.fix.longitude,
+		    "y" : gpsdIn.fix.latitude
+		}}
+
+		tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
+		if len(username) > 0 and len(password) > 0:
+		    token = gentoken(tokenUrl, username, password)
+
+		submitData = {}
+		submitData["Features"] = payload
+		submitData["f"] = "json"
+		submitData["token"] = token
+
+		# submit the request
+		submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
+		jAdd = json.loads(submitResponse.read())
+		if "addResults" in jAdd:
+		    if len(jAdd['addResults']) > 0:
+		        for addItem in jAdd['addResults']:
+		            if addItem['success'] == True:
+		                return "special point\ncreated"
+	except:
+	    return "couldnt make\nspecial point"
+
+
+	return "couldnt make\nspecial point"
 
 if __name__ == "__main__":
     # test me! (yeah, a lot of repeat code from MAIN.py)

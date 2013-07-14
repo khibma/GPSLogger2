@@ -10,6 +10,7 @@ import ConfigParser
 from getIP import IP2 as _IP
 from weather import getWeather as _WEATHER
 from pushPoints import push
+from pushPoints import pushSpecial
 
 
 # initalize the GPS...
@@ -25,6 +26,10 @@ passWord = config.get("AGOL", "pass")
 fname = config.get("POINTS", "fname")
 pCollectTime = config.get("POINTS", "pCollTime")
 pushOnConnect = config.get("POINTS", "pushIfWWW")
+
+agoToken = ConfigParser.ConfigParser()
+agoToken.read("agoToken.ini")
+token = agoToken.get("TOKEN", "ago")
 
 
 class GpsPoller(threading.Thread):
@@ -53,8 +58,40 @@ def getFileName():
 
 	return "points_0.csv"
 
+def checkToken(token):
 
-def go(filename):
+	from pushPoints import gentoken
+	import urllib, urllib2, json
+ 	tokenUrl = "https://www.arcgis.com/sharing/rest/generateToken"
+  	fsURL ="http://services1.arcgis.com/hLJbHVT9ZrDIzK0I/arcgis/rest/services/gpsCapture/FeatureServer/0"
+
+	submitData = {}
+	submitData["f"] = "pjson"
+	submitData["token"] = token
+
+    # submit the request
+	submitResponse = urllib2.urlopen(fsURL, urllib.urlencode(submitData))
+ 	jAdd = json.loads(submitResponse.read())
+
+	print jAdd
+
+	if "error" in jAdd:
+		print "its invalid"
+		token = gentoken(tokenUrl, userName, passWord)
+
+		agoTokenWrite = ConfigParser.ConfigParser()
+		writeToken = open("agoToken.ini", 'w')
+		agoTokenWrite.add_section('TOKEN')
+		agoTokenWrite.set('TOKEN','ago',token)
+		agoTokenWrite.write(writeToken)
+		writeToken.close()
+
+		print token
+
+	return token
+
+
+def go(filename, token):
 	print "here we go"
 
 
@@ -97,9 +134,9 @@ def go(filename):
 
 			if prev == 'l1':
 				prev = -1
-				lcd.message("reconneting internet")
-				# to be tested, what happens if cell phone internet drops, will it reconnect
-
+				msg = pushSpecial (gpsd, fsURL, userName, passWord)
+				lcd.message(msg)
+				sleep(1)
 			else:
 				prev = 'l1'
 				sats = gpsd.satellites
@@ -108,7 +145,7 @@ def go(filename):
 				    if item.used == True:
 				        gSatCount += 1
 				totSats = len(sats)
-				lcd.message("%s Sats \n overhead" % totSats)
+				lcd.message("%s Sats of\n %s used" % (gSatCount, totSats))
 				sleep(1)
 
 
@@ -119,11 +156,11 @@ def go(filename):
 			while prev == 'u1':
 				lcd.clear()
 				try:
-					msg = push (gpsd, fsURL, userName, passWord, filename)
+					msg = push (gpsd, fsURL, userName, passWord, filename, token)
 					content = str("{0:.3f},{1:.3f}\n{2}").format(msg[0], msg[1], msg[2])
 				except Exception, e:
 					print str(e)
-					content = "cant get lat/lon"
+					content = str(e)
 				lcd.message(content +str(i))
 				### press DOWN 1 second after an updated msg to quit logging
 				sleep(1)
@@ -197,6 +234,7 @@ if __name__ == '__main__':
     # When script is run as-is, assume its being started on boot
 
 	filename = getFileName()
+	token = checkToken(token)
 
 	gpsp = GpsPoller()
 	itsOver = True
@@ -205,7 +243,7 @@ if __name__ == '__main__':
 	while itsOver :
 		try:
  			gpsp.start()
- 			itsOver = go(filename)
+ 			itsOver = go(filename, token)
  			gpsp.running = False
 			gpsp.join() # wait for the thread to finish what it's doing
 			print itsOver
