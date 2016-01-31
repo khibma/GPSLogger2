@@ -3,7 +3,8 @@ GPSLogger
 
 Raspberry PI GPS Logger with LCD/button control
 
-This project was put together with a Raspberry Pi B, [Adafruit GPS](https://www.adafruit.com/products/746) and [Adafruit LCD 16x2 shield](https://www.adafruit.com/products/772) back in 2013 for a road trip across the US and into Canada. The code in the repo and the hardware haven't been used together since then. This readme is being updated today just as an explanation of the project. One day I may go back and test and cleanup the code.
+This project was put together with a Raspberry Pi B, [Adafruit GPS](https://www.adafruit.com/products/746) and [Adafruit LCD 16x2 shield](https://www.adafruit.com/products/772) back in 2013 for a road trip across the US and into Canada. During the trip the RPi was tethered via WIFI to a cell phone and using this internet connection, the points were pushed up to an [arcgis.com hosted feature service](https://doc.arcgis.com/en/arcgis-online/share-maps/publish-features.htm) for "live tracking"
+The code in the repo and the hardware haven't been used together since then. This readme is being updated today just as an explanation of the project. One day I may go back and test and cleanup the code.
 
 <a href="https://angp.maps.arcgis.com/apps/Embed/index.html?webmap=3b0e135a85db480aa1334acfa55b010e&amp;extent=-123.7335,22.3283,-58.8263,52.011&amp;zoom=true&amp;scale=false&amp;legend=true&amp;disable_scroll=false&amp;theme=light" style="color:#0000FF;text-align:left" target="_blank">View the map with the logged data points</a>
 
